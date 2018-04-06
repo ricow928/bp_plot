@@ -45,12 +45,19 @@ def main():
                       np.nanmax(bp_df['Diastolic (mmHg)'].values)])
     plt.hlines(mid_pt, xmin, xmax, linewidth=3)
 
+    # Create list of unique meds, sorted in chron order
+    chron_meds = []
+    for med in bp_df.Medication.values:
+        if med not in chron_meds:
+            chron_meds.append(med)
+    print chron_meds
+
     # Annotate with number of samples for each medication
     # positioner is found by trial/error
     positioner = -0.1
-    for med in np.unique(bp_df.Medication.values):
-        plt.text(positioner, mid_pt+1, 'n={0}'.
-                 format(len(bp_df[bp_df['Medication'] == med])))
+    for med in chron_meds:
+        count = len(bp_df[bp_df['Medication'] == med])
+        plt.text(positioner, mid_pt+1, 'n={0}'.format(count))
         positioner += 1
 
 if __name__ == "__main__":
