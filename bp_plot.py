@@ -50,7 +50,6 @@ def main():
     for med in bp_df.Medication.values:
         if med not in chron_meds:
             chron_meds.append(med)
-    print chron_meds
 
     # Annotate with number of samples for each medication
     # positioner is found by trial/error
