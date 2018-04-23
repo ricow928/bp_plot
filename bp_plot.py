@@ -8,7 +8,10 @@ Created on Wed Mar 21 09:12:36 2018
 import seaborn as sns
 import pandas as pd
 import numpy as np
+import scipy.stats as st
 import matplotlib.pyplot as plt
+
+SIG_LEVEL = 0.1
 
 
 def main():
@@ -29,6 +32,7 @@ def main():
     plt.ylabel('Pressure (mmHg)', fontweight='bold')
     plt.xlabel('Medication', fontweight='bold')
     plt.title("Walker BPs For Different Meds", fontweight='bold')
+    plt.xticks(rotation=10)
 
     # Find plot xlims
     ax = plt.gca()
@@ -58,6 +62,32 @@ def main():
         count = len(bp_df[bp_df['Medication'] == med])
         plt.text(positioner, mid_pt+1, 'n={0}'.format(count))
         positioner += 1
+
+    chron_meds.remove('Control')
+
+    # For each med, print result of KS 2-sample against control
+    for med in chron_meds:
+        sys_ks_d, sys_ks_p = st.mstats.ks_2samp(
+                bp_df[bp_df['Medication'] == 'Control']['Systolic (mmHg)'].values,
+                bp_df[bp_df['Medication'] == med]['Systolic (mmHg)'].values)
+        dia_ks_d, dia_ks_p = st.mstats.ks_2samp(
+                bp_df[bp_df['Medication'] == 'Control']['Diastolic (mmHg)'].values,
+                bp_df[bp_df['Medication'] == med]['Diastolic (mmHg)'].values)
+        pls_ks_d, pls_ks_p = st.mstats.ks_2samp(
+                bp_df[bp_df['Medication'] == 'Control']['Pulse (BPM)'].values,
+                bp_df[bp_df['Medication'] == med]['Pulse (BPM)'].values)
+
+        print "{0} -- Systolic: {1:.3f} (p = {2:.3f})".format(med,
+                                                              sys_ks_d,
+                                                              sys_ks_p)
+        print "{0} -- Diastolic: {1:.3f} (p = {2:.3f})".format(med,
+                                                               dia_ks_d,
+                                                               dia_ks_p)
+        print "{0} -- Pulse: {1:.3f} (p = {2:.3f})".format(med,
+                                                           pls_ks_d,
+                                                           pls_ks_p)
+        print "------------------------"
+
 
 if __name__ == "__main__":
     main()
